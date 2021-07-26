@@ -55,8 +55,10 @@ type ComplexityRoot struct {
 	}
 
 	AzureProviderConfig struct {
-		VnetCidr func(childComplexity int) int
-		Zones    func(childComplexity int) int
+		VnetCidr          func(childComplexity int) int
+		VnetName          func(childComplexity int) int
+		VnetResourceGroup func(childComplexity int) int
+		Zones             func(childComplexity int) int
 	}
 
 	ComponentConfiguration struct {
@@ -253,6 +255,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.AzureProviderConfig.VnetCidr(childComplexity), true
+
+	case "AzureProviderConfig.vnetName":
+		if e.complexity.AzureProviderConfig.VnetName == nil {
+			break
+		}
+
+		return e.complexity.AzureProviderConfig.VnetName(childComplexity), true
+
+	case "AzureProviderConfig.vnetResourceGroup":
+		if e.complexity.AzureProviderConfig.VnetResourceGroup == nil {
+			break
+		}
+
+		return e.complexity.AzureProviderConfig.VnetResourceGroup(childComplexity), true
 
 	case "AzureProviderConfig.zones":
 		if e.complexity.AzureProviderConfig.Zones == nil {
@@ -865,8 +881,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var parsedSchema = gqlparser.MustLoadSchema(
-	&ast.Source{Name: "schema.graphql", Input: `
-# Configuration of Runtime. We can consider returning kubeconfig as a part of this type.
+	&ast.Source{Name: "schema.graphql", Input: `# Configuration of Runtime. We can consider returning kubeconfig as a part of this type.
 type RuntimeConfig {
     clusterConfig: GardenerConfig
     kymaConfig: KymaConfig
@@ -908,6 +923,8 @@ type GCPProviderConfig {
 type AzureProviderConfig {
     vnetCidr: String
     zones: [String!]
+    vnetName: String
+    vnetResourceGroup: String
 }
 
 type AWSProviderConfig {
@@ -1091,6 +1108,8 @@ input GCPProviderConfigInput {
 input AzureProviderConfigInput {
     vnetCidr: String!   # Classless Inter-Domain Routing for the Azure Virtual Network
     zones: [String!]      # Zones in which to create the cluster
+    vnetName: String
+    vnetResourceGroup: String
 }
 
 input AWSProviderConfigInput {
@@ -1659,6 +1678,74 @@ func (ec *executionContext) _AzureProviderConfig_zones(ctx context.Context, fiel
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalOString2ᚕstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AzureProviderConfig_vnetName(ctx context.Context, field graphql.CollectedField, obj *AzureProviderConfig) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "AzureProviderConfig",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.VnetName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AzureProviderConfig_vnetResourceGroup(ctx context.Context, field graphql.CollectedField, obj *AzureProviderConfig) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "AzureProviderConfig",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.VnetResourceGroup, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ComponentConfiguration_component(ctx context.Context, field graphql.CollectedField, obj *ComponentConfiguration) (ret graphql.Marshaler) {
@@ -5502,6 +5589,18 @@ func (ec *executionContext) unmarshalInputAzureProviderConfigInput(ctx context.C
 			if err != nil {
 				return it, err
 			}
+		case "vnetName":
+			var err error
+			it.VnetName, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "vnetResourceGroup":
+			var err error
+			it.VnetResourceGroup, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -6245,6 +6344,10 @@ func (ec *executionContext) _AzureProviderConfig(ctx context.Context, sel ast.Se
 			out.Values[i] = ec._AzureProviderConfig_vnetCidr(ctx, field, obj)
 		case "zones":
 			out.Values[i] = ec._AzureProviderConfig_zones(ctx, field, obj)
+		case "vnetName":
+			out.Values[i] = ec._AzureProviderConfig_vnetName(ctx, field, obj)
+		case "vnetResourceGroup":
+			out.Values[i] = ec._AzureProviderConfig_vnetResourceGroup(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

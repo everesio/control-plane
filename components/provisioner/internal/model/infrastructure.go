@@ -45,6 +45,7 @@ func NewGCPControlPlane(zones []string) *gcp.ControlPlaneConfig {
 
 func NewAzureInfrastructure(workerCIDR string, azConfig AzureGardenerConfig) *azure.InfrastructureConfig {
 	isZoned := len(azConfig.input.Zones) > 0
+
 	return &azure.InfrastructureConfig{
 		TypeMeta: v1.TypeMeta{
 			Kind:       infrastructureConfigKind,
@@ -52,11 +53,22 @@ func NewAzureInfrastructure(workerCIDR string, azConfig AzureGardenerConfig) *az
 		},
 		Networks: azure.NetworkConfig{
 			Workers: workerCIDR,
-			VNet: azure.VNet{
-				CIDR: &azConfig.input.VnetCidr,
-			},
+			VNet:    NewAzureVNet(azConfig),
 		},
 		Zoned: isZoned,
+	}
+}
+
+func NewAzureVNet(azConfig AzureGardenerConfig) azure.VNet {
+	if azConfig.input.VnetName != nil && azConfig.input.VnetResourceGroup != nil && *azConfig.input.VnetName != "" && *azConfig.input.VnetResourceGroup != "" {
+		return azure.VNet{
+			Name:          azConfig.input.VnetName,
+			ResourceGroup: azConfig.input.VnetResourceGroup,
+		}
+	} else {
+		return azure.VNet{
+			CIDR: &azConfig.input.VnetCidr,
+		}
 	}
 }
 

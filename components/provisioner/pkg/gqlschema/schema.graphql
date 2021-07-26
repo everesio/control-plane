@@ -1,4 +1,3 @@
-
 # Configuration of Runtime. We can consider returning kubeconfig as a part of this type.
 type RuntimeConfig {
     clusterConfig: GardenerConfig
@@ -41,6 +40,8 @@ type GCPProviderConfig {
 type AzureProviderConfig {
     vnetCidr: String
     zones: [String!]
+    vnetName: String
+    vnetResourceGroup: String
 }
 
 type AWSProviderConfig {
@@ -224,6 +225,8 @@ input GCPProviderConfigInput {
 input AzureProviderConfigInput {
     vnetCidr: String!   # Classless Inter-Domain Routing for the Azure Virtual Network
     zones: [String!]      # Zones in which to create the cluster
+    vnetName: String
+    vnetResourceGroup: String
 }
 
 input AWSProviderConfigInput {

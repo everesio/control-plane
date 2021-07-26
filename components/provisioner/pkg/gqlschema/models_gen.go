@@ -39,15 +39,19 @@ type AWSZoneInput struct {
 }
 
 type AzureProviderConfig struct {
-	VnetCidr *string  `json:"vnetCidr"`
-	Zones    []string `json:"zones"`
+	VnetCidr          *string  `json:"vnetCidr"`
+	Zones             []string `json:"zones"`
+	VnetName          *string  `json:"vnetName"`
+	VnetResourceGroup *string  `json:"vnetResourceGroup"`
 }
 
 func (AzureProviderConfig) IsProviderSpecificConfig() {}
 
 type AzureProviderConfigInput struct {
-	VnetCidr string   `json:"vnetCidr"`
-	Zones    []string `json:"zones"`
+	VnetCidr          string   `json:"vnetCidr"`
+	Zones             []string `json:"zones"`
+	VnetName          *string  `json:"vnetName"`
+	VnetResourceGroup *string  `json:"vnetResourceGroup"`
 }
 
 type ClusterConfigInput struct {
